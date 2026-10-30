@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ExpenseForm from './components/ExpenseForm.jsx'
 import ExpenseList from './components/ExpenseList.jsx'
 import { CATEGORIES, getExpenseErrors } from './expenseUtils.js'
@@ -10,13 +10,29 @@ const currency = new Intl.NumberFormat('en-IN', {
 })
 
 function App() {
-  const [expenses, setExpenses] = useState([])
+  const [expenses, setExpenses] = useState(() => {
+    try {
+      const savedExpenses = window.localStorage.getItem('pennywise-expenses')
+      const parsedExpenses = savedExpenses ? JSON.parse(savedExpenses) : []
+      return Array.isArray(parsedExpenses) ? parsedExpenses : []
+    } catch {
+      return []
+    }
+  })
   const [title, setTitle] = useState('')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState(CATEGORIES[0])
   const [type, setType] = useState('expense')
   const [errors, setErrors] = useState({})
   const [filter, setFilter] = useState('All')
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('pennywise-expenses', JSON.stringify(expenses))
+    } catch {
+      // Keep the tracker usable when browser storage is unavailable or full.
+    }
+  }, [expenses])
 
   const displayedExpenses = useMemo(
     () =>
