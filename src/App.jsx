@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ExpenseForm from './components/ExpenseForm.jsx'
 import ExpenseList from './components/ExpenseList.jsx'
 import { CATEGORIES, getExpenseErrors } from './expenseUtils.js'
@@ -17,6 +17,22 @@ function App() {
   const [type, setType] = useState('expense')
   const [errors, setErrors] = useState({})
   const [filter, setFilter] = useState('All')
+  const titleInputRef = useRef(null)
+
+  useEffect(() => {
+    function handleShortcut(event) {
+      const isTyping = event.target instanceof HTMLElement
+        && event.target.closest('input, textarea, select, [contenteditable="true"]')
+
+      if (event.key === '/' && !isTyping && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault()
+        titleInputRef.current?.focus()
+      }
+    }
+
+    window.addEventListener('keydown', handleShortcut)
+    return () => window.removeEventListener('keydown', handleShortcut)
+  }, [])
 
   const displayedExpenses = useMemo(
     () =>
@@ -117,6 +133,7 @@ function App() {
               if (errors.title) setErrors((current) => ({ ...current, title: '' }))
             }}
             title={title}
+            titleInputRef={titleInputRef}
           />
 
           <ExpenseList

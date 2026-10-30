@@ -9,6 +9,7 @@ function ExpenseForm({
   onTitleChange,
   onTypeChange,
   title,
+  titleInputRef,
   type,
 }) {
   const isIncome = type === 'income'
@@ -48,6 +49,7 @@ function ExpenseForm({
         <input
           autoComplete="off"
           id="expense-title"
+          ref={titleInputRef}
           onChange={(event) => onTitleChange(event.target.value)}
           placeholder={isIncome ? 'e.g. Monthly salary' : 'e.g. Coffee with friends'}
           value={title}
